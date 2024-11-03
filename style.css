@@ -1,0 +1,36 @@
+/* Basic reset */
+body, html {
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+}
+
+/* Dark mode styling */
+body {
+    background-color: #121212; /* Dark background color */
+    color: #e0e0e0; /* Light text color */
+    line-height: 1.6;
+}
+
+header, footer {
+    background-color: #1f1f1f; /* Slightly lighter dark background for header and footer */
+    color: #e0e0e0; /* Light text color */
+    padding: 1rem;
+}
+
+a {
+    color: #bb86fc; /* Accent color for links */
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+main {
+    padding: 2rem;
+}
+
+h1, h2, h3 {
+    color: #ffffff; /* Ensure headers are easily readable */
+}
