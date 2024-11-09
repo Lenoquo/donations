@@ -24,11 +24,12 @@ const server = http.createServer((req, res) => {
     }
 
     if (req.url == '/favicon.ico') {
-        fs.readFile('./Untitled.png',(err,data) => {
+        fs.readFile('./icon.png',(err,data) => {
             res.end(data)
         })
     }
 
+    // POST request to add donation data to database
     if (req.url == '/boing') {
         let body = '';
         req.on('data',chunk => {body += chunk}); // every time a chunk of data is received, it is added to the body
@@ -40,27 +41,44 @@ const server = http.createServer((req, res) => {
         res.end();
     }
 
-    if (req.url === '/getdata' && req.method === 'GET') {
-        const data = fs.readFileSync('./stuff.txt','utf8');
+    // GET request to retrieve information from database
+    if (req.url.startsWith('/getdata') && req.method === 'GET') {
+        let data = JSON.stringify(retrieve_data(req.url));
         res.writeHead(200, {'Content-Type':'text/plain'});
         res.end(data);
+    }
+
+    // reset the database
+    if (req.url == '/reset') {
+        console.log('one reset please!')
+        names.forEach(name => {
+            fs.writeFileSync(`./data/${name}.txt`,'0',{encoding:'utf8',flag:'w'});
+        })
+        res.end()
     }
 
 }).listen(3000, () => {
     console.log('server is up and running');
 });
 
+const names = ['nobody','Alice','Bob','Carlos',
+    'Darla','Ellen','Franklin','Georgia','Hector','Iago'];
 
-
+// taking values from html page and stores them in correct database
 function update_data(x) {
 
     donation = JSON.parse(x); // this turns it into an object
-    
-    let data = JSON.parse(fs.readFileSync('./stuff.txt','utf8')); // this reads the data from the textfile as an object
 
-    data[donation.name] += parseInt(donation.amount);  // oh shit bruh
+    let current_total = parseInt(fs.readFileSync(`./data/${donation.name}.txt`,'utf-8'));
 
-    data = JSON.stringify(data); // turns data back to a string
+    let new_total = current_total + parseInt(donation.amount) +''; // +'' turns int to string
 
-    fs.writeFileSync('./stuff.txt',data,{encoding:'utf8',flag:'w'}); // writes said string to the ""database""
+    fs.writeFileSync(`./data/${donation.name}.txt`,new_total,{encoding:'utf8',flag:'w'});
+}
+
+
+function retrieve_data(url) {
+    let name = url.split('/').slice(-1)[0]; //gets just the name out of the url
+    let amount = parseInt(fs.readFileSync(`./data/${name}.txt`,'utf-8'));
+    return {name,amount}
 }

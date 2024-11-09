@@ -1,6 +1,6 @@
 // Here is where I will attempt to build the repetitive HTML in JavaScript
 
-const names = ['Alice','Bob','Carlos',
+const names = ['nobody','Alice','Bob','Carlos',
     'Darla','Ellen','Franklin',
     'Georgia','Hector','Iago'];
 
@@ -14,15 +14,12 @@ names.forEach(name => {
 
 dropdown.innerHTML = build_dropdown;
 biglist.innerHTML = build_biglist;
-
 ////
 
-update_screen();
+names.forEach(name => {update_screen(name)});
 
 button1.onclick = async () => {
-    console.log('swishy williams')
     if (!isNaN(parseInt(input.value))){
-        console.log('is number');
         await fetch('/boing',
             {
                 method:'POST',
@@ -33,25 +30,24 @@ button1.onclick = async () => {
             }
         )
 
-        update_screen();
-
+        update_screen(dropdown.value);
+        input.value = ''; // resets the text field to empty
     }
 };
 
 
-async function update_screen () {
-    let response = await fetch('/getdata');
-    let data = await response.text();
-    data = JSON.parse(data);
+async function update_screen (name) {
+    let response = await fetch(`/getdata/${name}`);
+    let data = await response.json();
     
-    const players = Object.keys(data);
-    console.log(players)
+    let f = document.getElementById(data.name);
+    f.innerHTML = data.amount;
+}
 
-    players.forEach(player => {
-        let f = document.getElementById(player);
-        f.innerHTML = data[player]
-    })
 
-    input.value = '';
+/////
 
+button2.onclick = async () => {
+    await fetch('/reset');
+    names.forEach(name => {update_screen(name)});
 }
