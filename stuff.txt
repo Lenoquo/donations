@@ -1,1 +1,0 @@
-{"Alice":68,"Bob":800,"Carlos":22,"Darla":0,"Ellen":58,"Franklin":0,"Georgia":335,"Hector":0,"Iago":222}
