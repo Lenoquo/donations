@@ -16,7 +16,7 @@ dropdown.innerHTML = build_dropdown;
 biglist.innerHTML = build_biglist;
 ////
 
-names.forEach(name => {update_total(name)}); // yo this updates the grand total too!
+names.forEach(name => {update_total(name,true)});
 
 button1.onclick = async () => {
     if (!isNaN(parseInt(input.value))){
@@ -29,20 +29,21 @@ button1.onclick = async () => {
                 body: JSON.stringify({name:dropdown.value,amount:input.value})  // you need to use stringify because thats how it is
             }
         )
-
         update_total(dropdown.value);
+        grandTotal.innerHTML = parseInt(grandTotal.innerHTML) + parseInt(input.value);
         input.value = ''; // resets the text field to empty
     }
 };
 
 
-async function update_total (name) {
+async function update_total (name,startup = false) {
     let response = await fetch(`/getdata/${name}`);
     let data = await response.json();
-    
+
     let f = document.getElementById(data.name);
     f.innerHTML = data.amount;
-    grandTotal.innerHTML = parseInt(grandTotal.innerHTML) + parseInt(f.innerHTML)
+
+    if (startup) {grandTotal.innerHTML = parseInt(grandTotal.innerHTML) + parseInt(f.innerHTML)}
 }
 
 
