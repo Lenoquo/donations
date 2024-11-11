@@ -16,7 +16,7 @@ dropdown.innerHTML = build_dropdown;
 biglist.innerHTML = build_biglist;
 ////
 
-names.forEach(name => {update_screen(name)});
+names.forEach(name => {update_total(name)}); // yo this updates the grand total too!
 
 button1.onclick = async () => {
     if (!isNaN(parseInt(input.value))){
@@ -30,18 +30,19 @@ button1.onclick = async () => {
             }
         )
 
-        update_screen(dropdown.value);
+        update_total(dropdown.value);
         input.value = ''; // resets the text field to empty
     }
 };
 
 
-async function update_screen (name) {
+async function update_total (name) {
     let response = await fetch(`/getdata/${name}`);
     let data = await response.json();
     
     let f = document.getElementById(data.name);
     f.innerHTML = data.amount;
+    grandTotal.innerHTML = parseInt(grandTotal.innerHTML) + parseInt(f.innerHTML)
 }
 
 
@@ -49,5 +50,6 @@ async function update_screen (name) {
 
 button2.onclick = async () => {
     await fetch('/reset');
-    names.forEach(name => {update_screen(name)});
+    names.forEach(name => {update_total(name)});
+    grandTotal.innerHTML = 0;
 }

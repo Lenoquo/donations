@@ -35,7 +35,7 @@ const server = http.createServer((req, res) => {
         req.on('data',chunk => {body += chunk}); // every time a chunk of data is received, it is added to the body
 
         req.on('end',()=>{
-            update_data(body);
+            update_data(body);// body is stringified object containing the dropdown value and text bar value
             res.writeHead(200, {'Content-Type': 'text/plain'});
         });
         res.end();
@@ -54,6 +54,7 @@ const server = http.createServer((req, res) => {
         names.forEach(name => {
             fs.writeFileSync(`./data/${name}.txt`,'0',{encoding:'utf8',flag:'w'});
         })
+        fs.writeFileSync(`./data/log.txt`,'{}',{encoding:'utf8',flag:'w'});
         res.end()
     }
 
@@ -65,15 +66,19 @@ const names = ['nobody','Alice','Bob','Carlos',
     'Darla','Ellen','Franklin','Georgia','Hector','Iago'];
 
 // taking values from html page and stores them in correct database
+
 function update_data(x) {
-
-    donation = JSON.parse(x); // this turns it into an object
-
+    // add to contestant's file
+    let donation = JSON.parse(x); // this turns it into an object
     let current_total = parseInt(fs.readFileSync(`./data/${donation.name}.txt`,'utf-8'));
-
     let new_total = current_total + parseInt(donation.amount) +''; // +'' turns int to string
-
     fs.writeFileSync(`./data/${donation.name}.txt`,new_total,{encoding:'utf8',flag:'w'});
+
+    //add to log
+    let log = JSON.parse(fs.readFileSync('./data/log.txt','utf-8'));
+    let num = Object.keys(log).length; // first donation is #0
+    log[num] = donation;
+    fs.writeFileSync('./data/log.txt',JSON.stringify(log),{encoding:'utf-8',flag:'w'});
 }
 
 
