@@ -29,16 +29,24 @@ const server = http.createServer((req, res) => {
         })
     }
 
+    if (req.url == '/hi'){
+        console.log('test!')
+        res.end('hi')
+    }
+
     // POST request to add donation data to database
     if (req.url == '/boing') {
         let body = '';
         req.on('data',chunk => {body += chunk}); // every time a chunk of data is received, it is added to the body
 
         req.on('end',()=>{
-            update_data(body);// body is stringified object containing the dropdown value and text bar value
+            output = update_data(body);// body is stringified object containing the dropdown value and text bar value
+            console.log({output})
             res.writeHead(200, {'Content-Type': 'text/plain'});
+            res.end(output);
         });
-        res.end();
+        
+        // i moved the res.end() from here into the req.on(). idk if thats best practice but it works for what i need
     }
 
     // GET request to retrieve information from database
@@ -76,9 +84,11 @@ function update_data(x) {
 
     //add to log
     let log = JSON.parse(fs.readFileSync('./data/log.txt','utf-8'));
-    let num = Object.keys(log).length; // first donation is #0
+    let num = Object.keys(log).length + 1;
     log[num] = donation;
     fs.writeFileSync('./data/log.txt',JSON.stringify(log),{encoding:'utf-8',flag:'w'});
+
+    return `<p>#${num} ${donation.name}: ${donation.amount}</p>`
 }
 
 
@@ -87,3 +97,13 @@ function retrieve_data(url) {
     let amount = parseInt(fs.readFileSync(`./data/${name}.txt`,'utf-8'));
     return {name,amount}
 }
+
+
+/*
+
+when we get something back from the get request, its an array with items
+the first item is the contestant's name and the total stored in their text file
+the second item is the new html string that is created for the log on screen
+
+
+*/

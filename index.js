@@ -16,11 +16,11 @@ dropdown.innerHTML = build_dropdown;
 biglist.innerHTML = build_biglist;
 ////
 
-names.forEach(name => {update_total(name)}); // yo this updates the grand total too!
+names.forEach(name => {update_total(name,true)});
 
 button1.onclick = async () => {
     if (!isNaN(parseInt(input.value))){
-        await fetch('/boing',
+        let log_html = await fetch('/boing',
             {
                 method:'POST',
                 headers: {
@@ -29,20 +29,25 @@ button1.onclick = async () => {
                 body: JSON.stringify({name:dropdown.value,amount:input.value})  // you need to use stringify because thats how it is
             }
         )
-
         update_total(dropdown.value);
+        grandTotal.innerHTML = parseInt(grandTotal.innerHTML) + parseInt(input.value);
         input.value = ''; // resets the text field to empty
+        log.innerHTML += await log_html.text();
     }
 };
 
 
-async function update_total (name) {
+async function update_total (name,startup = false) {
     let response = await fetch(`/getdata/${name}`);
     let data = await response.json();
-    
+
     let f = document.getElementById(data.name);
     f.innerHTML = data.amount;
-    grandTotal.innerHTML = parseInt(grandTotal.innerHTML) + parseInt(f.innerHTML)
+
+    if (startup) { //this doesnt run once at start up in runs 10 times jsyn
+        grandTotal.innerHTML = parseInt(grandTotal.innerHTML) + parseInt(f.innerHTML)
+        // add code that iterates the log at the bottom?
+    }
 }
 
 
@@ -52,4 +57,11 @@ button2.onclick = async () => {
     await fetch('/reset');
     names.forEach(name => {update_total(name)});
     grandTotal.innerHTML = 0;
+    log.innerHTML = '';
+}
+
+
+hi.onclick = async () => {
+    console.log('hi')
+    await fetch('/hi')
 }
